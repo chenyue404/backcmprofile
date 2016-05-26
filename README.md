@@ -2,7 +2,7 @@
 用于备份[CyanogenMod](http://www.cyanogenmod.org/)的情景模式。当然，兼容CM情景模式的ROM应该也可以用。
 
 # TODO
-- ~~还原~~的
+- ~~还原~~
 - 删除
 - 成功提示
 - 重启
