@@ -11,4 +11,6 @@
     <string name="delete_back_up">删除备份文件</string>
     <string name="restart">重启</string>
     <string name="restart_later">以后重启</string>
+    <string name="profile_name">profiles.xml</string>
+    <string name="back_up_file_deleted">备份文件已删除</string>
 </resources>

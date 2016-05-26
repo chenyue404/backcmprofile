@@ -1,5 +1,6 @@
 package backcmprofile.cy.cm;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
@@ -26,10 +27,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     BufferedReader osReader;
     BufferedReader osErrorReader;
 
+    String FILENAME;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        FILENAME = getString(R.string.profile_name);
 
         initUI();
     }
@@ -77,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void restoreProfile() throws IOException, InterruptedException {
         getRoot();
-        String cmd = "cp " + getSDPath() + "/profiles.xml " + "/data/system/profiles.xml";
+        String cmd = "cp " + getSDPath() + "/" + FILENAME + " /data/system/" + FILENAME;
         os.writeBytes(cmd);
 
         String result = exitProcess();
@@ -86,14 +91,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     .setPositiveButton(R.string.restart, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            //TODO 重启手机
+                            try {
+                                try {
+                                    rebootPhone();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                             dialog.cancel();
                         }
                     })
                     .setNeutralButton(R.string.delete_back_up, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            //TODO 删除备份文件
+                            try {
+                                deleteProfile();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     })
                     .setNegativeButton(R.string.restart_later, new DialogInterface.OnClickListener() {
@@ -110,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!TextUtils.isEmpty(result)) {
 
             if (result.contains("No such file")) {
-                result = getResources().getString(R.string.back_up_read_file_failure);
+                result = getString(R.string.back_up_read_file_failure);
             }
 
             new AlertDialog.Builder(this).setMessage(result).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -122,9 +141,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void deleteProfile() throws IOException, InterruptedException {
+        getRoot();
+
+        String cmd = "rm -f " + getSDPath() + "/" + getString(R.string.profile_name);
+        os.writeBytes(cmd);
+
+        String result = exitProcess();
+        if (result.equals("0")) {
+            new AlertDialog.Builder(this).setMessage(R.string.back_up_file_deleted).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            }).show();
+            return;
+        }
+
+        if (!TextUtils.isEmpty(result)) {
+
+            if (result.contains("No such file")) {
+                result = getString(R.string.back_up_read_file_failure);
+            }
+
+            new AlertDialog.Builder(this).setMessage(result).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            }).show();
+        }
+    }
+
+
+    private void rebootPhone() throws IOException, InterruptedException {
+        getRoot();
+
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        String cmd = "reboot";
+        os.writeBytes(cmd);
+        String result = exitProcess();
+    }
+
     private void backUpProfile() throws IOException, InterruptedException {
         getRoot();
-        String cmd = "cp " + "/data/system/profiles.xml " + getSDPath() + "/profiles.xml";
+        String cmd = "cp " + "/data/system/" + FILENAME + " " + getSDPath() + "/" + FILENAME;
         os.writeBytes(cmd);
 
         String result = exitProcess();
@@ -142,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!TextUtils.isEmpty(result)) {
 
             if (result.contains("No such file")) {
-                result = getResources().getString(R.string.back_up_read_file_failure);
+                result = getString(R.string.back_up_read_file_failure);
             }
 
             new AlertDialog.Builder(this).setMessage(result).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -190,13 +254,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private String getSDPath() {
-        File sdDir = null;
-        boolean sdCardExist = Environment.getExternalStorageState()
-                .equals(Environment.MEDIA_MOUNTED);//判断sd卡是否存在
-        if (sdCardExist) {
-            sdDir = Environment.getExternalStorageDirectory();//获取跟目录
-        }
-        return sdDir.toString();
+//        File sdDir = null;
+//        boolean sdCardExist = Environment.getExternalStorageState()
+//                .equals(Environment.MEDIA_MOUNTED);//判断sd卡是否存在
+//        if (sdCardExist) {
+//            sdDir = Environment.getExternalStorageDirectory();//获取根目录
+//        }
+//        return sdDir.toString();
+        return "/mnt/sdcard";
     }
 
     private String getRootPath() {
