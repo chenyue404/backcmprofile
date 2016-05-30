@@ -1,11 +1,11 @@
 package backcmprofile.cy.cm;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -17,17 +17,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends Activity implements View.OnClickListener {
 
-    Button btBackUp, btRestore;
-    static String LOGTAG = MainActivity.class.getSimpleName();
+    private Button btBackUp, btRestore;
+    private static final String LOGTAG = MainActivity.class.getSimpleName();
 
-    Process process;
-    DataOutputStream os;
-    BufferedReader osReader;
-    BufferedReader osErrorReader;
+    private Process process;
+    private DataOutputStream os;
+    private BufferedReader osReader;
+    private BufferedReader osErrorReader;
 
-    String FILENAME;
+    private String FILENAME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (!TextUtils.isEmpty(result)) {
 
             if (result.contains("No such file")) {
-                result = getString(R.string.back_up_read_file_failure);
+                result = getString(R.string.restore_read_file_failure);
             }
 
             new AlertDialog.Builder(this).setMessage(result).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
