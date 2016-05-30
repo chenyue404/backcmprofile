@@ -13,4 +13,5 @@
     <string name="restart_later">以后重启</string>
     <string name="profile_name">profiles.xml</string>
     <string name="back_up_file_deleted">备份文件已删除</string>
+    <string name="about">本软件主要用于CyanogenMod的情景模式的备份和还原\n默认备份文件存放路径为/mnt/sdcard/profiles.xml\n其实是很简单的一个操作，只是封装成app了方便一些\n只做了一点很微小的工作</string>
 </resources>
